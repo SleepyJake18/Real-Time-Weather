@@ -1,17 +1,30 @@
-var apiKey = 'aaf35f46c02471bc7941f4fcd7ffc174';
+let apiKey = 'aaf35f46c02471bc7941f4fcd7ffc174';
+const searchBtn = document.getElementById(`search`);
 
 //https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
 
+
 function displayWeather() {
+    let locationInput = document.getElementById(`location`).value;
+    fetch("https://api.openweathermap.org/data/2.5/weather?q=" + locationInput + "&appid=" + apiKey)
+    .then(function(coordinateRepsonse) {
+        console.log(coordinateRepsonse)
+        return coordinateRepsonse.json();
+    })
+    .then(function(data){
+        console.log(data)
+        localStorage.setItem(`latitude`, data.coord.lat);
+        localStorage.setItem(`longitude`, data.coord.lon);
     
-    fetch("https://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&units=imperial&appid=" + apiKey)
+        var latitude = localStorage.getItem(`latitude`);
+        var longitude = localStorage.getItem(`longitude`);
+        fetch("https://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&units=imperial&appid=" + apiKey)
     .then(function(repsonse) {
         console.log(repsonse)
         return repsonse.json();
     })
     .then(function(data){
-        console.log(data)
-
+        console.log(data);
         var weatherIcon = data.current.weather[0].icon;
         var dailyWeatherIcon1 = data.daily[0].weather[0].icon;
         var dailyWeatherIcon2 = data.daily[1].weather[0].icon;
@@ -45,30 +58,18 @@ function displayWeather() {
         document.getElementById("dailyHumidity4").textContent = "Humidity: " + data.daily[3].humidity + " %";
         document.getElementById("dailyHumidity5").textContent = "Humidity: " + data.daily[4].humidity + " %";
     })
+    })
 };
 
-function retrieveCoordinates() {
-    fetch("https://api.openweathermap.org/data/2.5/weather?q=Columbus&appid=" + apiKey)
-    .then(function(coordinateRepsonse) {
-        console.log(coordinateRepsonse)
-        return coordinateRepsonse.json();
-    })
-    .then(function(data){
-        console.log(data)
-        localStorage.setItem(`latitude`, data.coord.lat);
-        localStorage.setItem(`longitude`, data.coord.lon);
+searchBtn.addEventListener(`click`, function(event){
+    event.preventDefault();
+    const element = event.target;
     
-        var latitude = localStorage.getItem(`latitude`);
-        var longitude = localStorage.getItem(`longitude`);
-        fetch("https://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&units=imperial&appid=" + apiKey)
-    .then(function(repsonse) {
-        console.log(repsonse)
-        return repsonse.json();
-    })
-    .then(function(data){
-        console.log(data);
-    })
-    })
-};
+    if (element.matches(`button`)) {
+        let locationInput = document.getElementById(`location`).value;
+        displayWeather();
 
-retrieveCoordinates();
+        locationInput.textContent = "";
+        
+    }
+});
